@@ -14,13 +14,12 @@ implementation {
 
     // Read Light, Temp, Humidity
     components SerialPrintfC;
-    /*
     components new SensirionSht11C() as TempSensor;
     components new HamamatsuS10871TsrC() as LightSensor;
     App.TempRead -> TempSensor.Temperature;
     App.LightRead -> LightSensor;
     App.HumidityRead -> TempSensor.Humidity;
-    */
+
     components UserButtonC;
     App.Get -> UserButtonC;
     App.Notify -> UserButtonC;

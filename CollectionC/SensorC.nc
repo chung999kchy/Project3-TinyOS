@@ -18,12 +18,11 @@ module SensorC
         interface Get<button_state_t>;
         interface Notify<button_state_t>;
     }
-    /*
     uses {
         interface Read<uint16_t> as TempRead;
         interface Read<uint16_t> as LightRead;
         interface Read<uint16_t> as HumidityRead; 
-    }*/
+    }
     //Radio
     uses {
         interface Packet;
@@ -38,6 +37,9 @@ implementation {
 
     bool _radioBusy = FALSE;
     message_t _packet;
+    uint16_t temp;
+    uint16_t light;
+    uint16_t humidity;
     SensorMsg_t *_Node;
     
 
@@ -56,7 +58,38 @@ implementation {
     }
 
     event void Timer.fired(){
-        printf("\r\n\n");
+
+        if(call TempRead.read() == SUCCESS){
+            // success
+        }else {
+            call Leds.led1Toggle();     
+        }
+
+        if(call LightRead.read() == SUCCESS){
+            // success
+        }else {
+            call Leds.led1Toggle();
+        }
+
+        if(call HumidityRead.read() == SUCCESS){
+            // success
+        }else {
+            call Leds.led1Toggle();
+        }
+
+        if (_radioBusy == FALSE){
+            // Create packet
+            SensorMsg_t* msg = call Packet.getPayload(& _packet, sizeof(SensorMsg_t));
+            msg -> NodeId = TOS_NODE_ID;
+            msg -> Data[0]= (uint8_t) light;
+            msg -> Data[1]= (uint8_t) temp;
+            msg -> Data[2]= (uint8_t) humidity;
+                  
+            // Sending packet
+            if(call AMSend.send(AM_BROADCAST_ADDR, & _packet, sizeof(SensorMsg_t)) == SUCCESS){
+                _radioBusy = TRUE;
+            }
+        }
     }
 
     
@@ -85,10 +118,33 @@ implementation {
         if (len == sizeof(SensorMsg_t)){
             SensorMsg_t * incomingPacket = (SensorMsg_t*)payload;
             if (incomingPacket -> NodeId != 1){
-                printf("Sensor gui id = %d la : %d ; %d ; %d \r\n", incomingPacket->NodeId,
-                 incomingPacket->Data[0],incomingPacket->Data[1], incomingPacket->Data[2]);
+                //
             }
         }    
         return msg;
+    }
+
+    event void TempRead.readDone(error_t result, uint16_t val){
+        if (result == SUCCESS){      // success
+            temp = (uint16_t)(-39.6 + 0.01*val);
+        }else {                 //problem
+            printf("Error reading from sensor temp! \r\n");
+        }
+    }
+
+    event void LightRead.readDone(error_t result, uint16_t val){
+        if (result == SUCCESS){      // success
+            light = 2.5*(val/4096.0)*6250.0;
+        }else {                 //problem
+            printf("Error reading from sensor light! \r\n");
+        }
+    }
+
+    event void HumidityRead.readDone(error_t result, uint16_t val){
+        if (result == SUCCESS){      // success
+            humidity = -2.0468 + 0.0367*val-1.5955*pow(10,-6)*val*val;
+        }else {                 //problem
+            printf("Error reading from sensor humidity! \r\n");
+        }
     }
 }

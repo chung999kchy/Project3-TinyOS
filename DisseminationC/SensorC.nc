@@ -41,65 +41,48 @@ implementation {
     uint16_t light;
     uint16_t humidity;
     SensorMsg_t *_Node;
-    uint8_t data[3] = {0, 0, 0};
+    
 
     event void Boot.booted(){
         _Node -> NodeId = TOS_NODE_ID;
-        //    _Node -> Data = (uint8_t) val;
-        
+        _Node -> Data[0] = 0;   // set Light = 0
+        _Node -> Data[1] = 0;   // set temperature = 0
+        _Node -> Data[2] = 0;   // set humidity = 0
         call Timer.startPeriodic(5000);
         call Notify.enable();
         call AMControl.start();
     }
 
     event void Notify.notify(button_state_t val){
-        /*if (_radioBusy == FALSE){
-            // Create packet
-            SensorMsg_t* msg = call Packet.getPayload(& _packet, sizeof(SensorMsg_t));
-            msg -> NodeId = TOS_NODE_ID;
-            msg -> Data[0]= (uint8_t) data[0];
-            msg -> Data[1]= (uint8_t) data[1];
-            msg -> Data[2]= (uint8_t) data[2];
-                  
-            // Sending packet
-            if(call AMSend.send(AM_BROADCAST_ADDR, & _packet, sizeof(SensorMsg_t)) == SUCCESS){
-                _radioBusy = TRUE;
-            }
-        }
-        */
+        
     }
 
     event void Timer.fired(){
-        printf ("Sensor  %d : Result \r\n ", _Node->NodeId);
         if(call TempRead.read() == SUCCESS){
-            //call Leds.led0Toggle(); // success
+            // success
         }else {
-            call Leds.led1Toggle();     // problem
+            call Leds.led1Toggle();     
         }
 
         if(call LightRead.read() == SUCCESS){
-            //call Leds.led1Toggle();     // success
+            // success
         }else {
-            call Leds.led1Toggle();     // problem
+            call Leds.led1Toggle();
         }
 
         if(call HumidityRead.read() == SUCCESS){
-            //call Leds.led2Toggle();     // success
+            // success
         }else {
-            call Leds.led1Toggle();     // problem
+            call Leds.led1Toggle();
         }
-        data[0] = light;
-        data[1] = temp;
-        data[2] = humidity;
-
 
         if (_radioBusy == FALSE){
             // Create packet
-            SensorMsg_t* msg = call Packet.getPayload(& _packet, sizeof(SensorMsg_t));
-            msg -> NodeId = TOS_NODE_ID;
-            msg -> Data[0]= (uint8_t) data[0];
-            msg -> Data[1]= (uint8_t) data[1];
-            msg -> Data[2]= (uint8_t) data[2];
+            SensorMsg_t* msg1 = call Packet.getPayload(& _packet, sizeof(SensorMsg_t));
+            msg1 -> NodeId = TOS_NODE_ID;
+            msg1 -> Data[0]= (uint8_t) light;
+            msg1 -> Data[1]= (uint8_t) temp;
+            msg1 -> Data[2]= (uint8_t) humidity;
                   
             // Sending packet
             if(call AMSend.send(AM_BROADCAST_ADDR, & _packet, sizeof(SensorMsg_t)) == SUCCESS){
@@ -133,8 +116,20 @@ implementation {
     event message_t * Receive.receive(message_t *msg, void *payload, uint8_t len){
         if (len == sizeof(SensorMsg_t)){
             SensorMsg_t * incomingPacket = (SensorMsg_t*)payload;
-            if (incomingPacket -> NodeId == 2){
-                printf("data vua gui: %d ; %d ; %d \r\n", incomingPacket->Data[0],incomingPacket->Data[1], incomingPacket->Data[2]);
+            if (incomingPacket -> NodeId == 3){
+                if (_radioBusy == FALSE){
+                    // Create packet
+                    SensorMsg_t* msg2 = call Packet.getPayload(& _packet, sizeof(SensorMsg_t));
+                    msg2 -> NodeId = incomingPacket->NodeId;
+                    msg2 -> Data[0]= (uint8_t) incomingPacket->Data[0];
+                    msg2 -> Data[1]= (uint8_t) incomingPacket->Data[1];
+                    msg2 -> Data[2]= (uint8_t) incomingPacket->Data[2];
+                        
+                    // Sending packet
+                    if(call AMSend.send(AM_BROADCAST_ADDR, & _packet, sizeof(SensorMsg_t)) == SUCCESS){
+                        _radioBusy = TRUE;
+                    }
+                }
             }
         }    
         return msg;
@@ -143,7 +138,6 @@ implementation {
     event void TempRead.readDone(error_t result, uint16_t val){
         if (result == SUCCESS){      // success
             temp = (uint16_t)(-39.6 + 0.01*val);
-            printf("    temp is : %d ", temp);
         }else {                 //problem
             printf("Error reading from sensor temp! \r\n");
         }
@@ -152,7 +146,6 @@ implementation {
     event void LightRead.readDone(error_t result, uint16_t val){
         if (result == SUCCESS){      // success
             light = 2.5*(val/4096.0)*6250.0;
-            printf("Current  light is : %d", light);
         }else {                 //problem
             printf("Error reading from sensor light! \r\n");
         }
@@ -161,7 +154,6 @@ implementation {
     event void HumidityRead.readDone(error_t result, uint16_t val){
         if (result == SUCCESS){      // success
             humidity = -2.0468 + 0.0367*val-1.5955*pow(10,-6)*val*val;
-            printf("    humidity is : %d % \r\n\n", humidity);
         }else {                 //problem
             printf("Error reading from sensor humidity! \r\n");
         }
