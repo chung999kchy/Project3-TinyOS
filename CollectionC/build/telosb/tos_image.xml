@@ -1,13 +1,13 @@
 <tos_image>
   <ident>
-    <timestamp>5FC70AEDL</timestamp>
-    <username>chung</username>
-    <hostname>chung-Inspiron-</hostname>
-    <platform>telosb</platform>
     <deluge_support>no</deluge_support>
+    <uidhash>90E293BDL</uidhash>
     <userhash>FDDA5F7DL</userhash>
-    <uidhash>6FFDE049L</uidhash>
+    <username>chung</username>
+    <timestamp>5FC72B49L</timestamp>
+    <platform>telosb</platform>
     <appname>SensorAppC</appname>
+    <hostname>chung-Inspiron-</hostname>
   </ident>
   <image format="ihex">
 :104000005542200135D0085A82453C1331400039D1

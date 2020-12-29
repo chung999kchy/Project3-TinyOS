@@ -56,7 +56,6 @@ implementation {
     }
 
     event void Timer.fired(){
-        printf("\r\n\n");
     }
 
     
