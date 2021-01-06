@@ -9,22 +9,20 @@ def humiTo(a):
     return round(b, 2)
 
 f = open('output.txt','r')
-col_names = ['type_packet','destination_address','source_address'
-            , 'len_payload', 'id_group', 'note_id1', 'temp1' ,'humi1'
-            , 'note_id2', 'temp2' ,'humi2', 'note_id3', 'temp3' 
-            , 'humi3', 'note_id4', 'temp4' ,'humi4']
+col_names = ['type_packet','destination','source', 'len_payload', 'id_group', 'note_id1', 'temp1' ,'humi1', 'note_id2', 'temp2' ,'humi2', 'note_id3', 'temp3', 'humi3', 'note_id4', 'temp4' ,'humi4']
 
-df = pd.DataFrame([0 for i in range(len(col_names))], columns = col_names)
+df = pd.DataFrame(np.zeros((1,len(col_names))), columns = col_names)
 
 while True:
     data=f.readline()
+    data = data.split(" ")
     if data == ['']:
         break
-    data = data.split(" ")
+    
     try:
         data.remove('\n')
     except:
-        continue
+        break
     type_msg = data[0]
     destination_add = data[1]+data[2]
     source_add = data[3]+data[4]
@@ -55,11 +53,15 @@ while True:
     humi4 = int(data[30]+data[31],16)
     humi4 = humiTo(humi4)
 
-    data1 = [type_msg, destination_add, source_add, len_payload, id_group, id_note1, temp1,
-                        humi1, id_note2, temp2, humi2, id_note3, temp3, humi3, id_note4, temp1, humi4]
-    df1 = pd.DataFrame(data1, columns = col_names)
-    df = df.append(df1, ignore_index = True)
+    #data1 = np.array([type_msg, destination_add, source_add, len_payload, id_group, id_note1, temp1,
+                        #humi1, id_note2, temp2, humi2, id_note3, temp3, humi3, id_note4, temp1, humi4])
+    #df1 = pd.DataFrame(data1, columns = col_names)
+    new_row = {'type_packet':type_msg, 'destination': destination_add, 'source':source_add,
+              'len_payload':len_payload, 'id_group':id_group,
+              'note_id1':id_note1, 'temp1':temp1, 'humi1':humi1,
+              'note_id2':id_note2, 'temp2':temp2, 'humi2':humi2,
+              'note_id3':id_note3, 'temp3':temp3, 'humi3':humi3,
+              'note_id4':id_note4, 'temp4':temp4, 'humi4':humi4,}
+    df = df.append(new_row, ignore_index = True)
 
 print(df)
-
-

@@ -1,13 +1,13 @@
 <tos_image>
   <ident>
-    <uidhash>D5E799C4L</uidhash>
-    <deluge_support>no</deluge_support>
+    <uidhash>8E69A05AL</uidhash>
     <userhash>FDDA5F7DL</userhash>
     <hostname>chung-Inspiron-</hostname>
-    <timestamp>5FEB45FBL</timestamp>
     <platform>telosb</platform>
     <username>chung</username>
+    <deluge_support>no</deluge_support>
     <appname>RadioSenseAppC</appname>
+    <timestamp>5FEC1B25L</timestamp>
   </ident>
   <image format="ihex">
 :104000005542200135D0085A8245AA123140003964

@@ -1,13 +1,13 @@
 <tos_image>
   <ident>
-    <userhash>FDDA5F7DL</userhash>
-    <platform>telosb</platform>
-    <timestamp>5FEB462EL</timestamp>
-    <deluge_support>no</deluge_support>
     <appname>BaseStationC</appname>
+    <userhash>FDDA5F7DL</userhash>
+    <deluge_support>no</deluge_support>
+    <timestamp>5FEC1BE9L</timestamp>
     <hostname>chung-Inspiron-</hostname>
-    <uidhash>B47E30B8L</uidhash>
     <username>chung</username>
+    <platform>telosb</platform>
+    <uidhash>7D900822L</uidhash>
   </ident>
   <image format="ihex">
 :104000005542200135D0085A8245621531400039A9
